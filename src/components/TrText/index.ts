@@ -1,0 +1,1 @@
+export { TrText } from "./TrText";

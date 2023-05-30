@@ -1,0 +1,1 @@
+export { TrWord } from "./TrWord";
