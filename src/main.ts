@@ -8,6 +8,7 @@ const AT = reactToWebComponent(App, React, ReactDOM, {
   props: {
     audio: "string",
     transcription: "string",
+    start: "string",
   },
 });
 

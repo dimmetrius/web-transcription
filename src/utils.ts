@@ -1,17 +1,17 @@
 export interface DeepgramJson {
   metadata: Metadata;
-  results:  Results;
+  results: Results;
 }
 
 export interface Metadata {
   transaction_key: string;
-  request_id:      string;
-  sha256:          string;
-  created:         Date;
-  duration:        number;
-  channels:        number;
-  models:          string[];
-  model_info:      ModelInfo;
+  request_id: string;
+  sha256: string;
+  created: Date;
+  duration: number;
+  channels: number;
+  models: string[];
+  model_info: ModelInfo;
 }
 
 export interface ModelInfo {
@@ -19,9 +19,9 @@ export interface ModelInfo {
 }
 
 export interface ModelDescriptio {
-  name:    string;
+  name: string;
   version: string;
-  arch:    string;
+  arch: string;
 }
 
 export interface Results {
@@ -35,35 +35,47 @@ export interface Channel {
 export interface Alternative {
   transcript: string;
   confidence: number;
-  words:      Word[];
+  words: Word[];
 }
 
 export interface Word {
-  word:               string;
-  start:              number;
-  end:                number;
-  confidence:         number;
-  speaker:            number;
+  word: string;
+  start: number;
+  end: number;
+  confidence: number;
+  speaker: number;
   speaker_confidence: number;
-  punctuated_word:    string;
+  punctuated_word: string;
 }
 
 export interface TranscriptionItem {
-  vttCue: VTTCue,
-  word: Word
+  vttCue: VTTCue;
+  word: Word;
 }
 
-export const parseDeepgram: (item: DeepgramJson) => TranscriptionItem[] = (item: DeepgramJson) => {
-  const words = item.results.channels[0].alternatives[0].words
+export const parseDeepgram: (item: DeepgramJson) => TranscriptionItem[] = (
+  item: DeepgramJson
+) => {
+  const words = item.results.channels[0].alternatives[0].words;
   return words.map((word) => {
-    const vttCue = new VTTCue(
-      word.start,
-      word.end,
-      word.punctuated_word,
-    );
-    vttCue.id = [word.start, word.end, word.punctuated_word].join(
-      '-',
-    );
-    return {vttCue, word};
-  })
+    const vttCue = new VTTCue(word.start, word.end, word.punctuated_word);
+    vttCue.id = [word.start, word.end, word.punctuated_word].join("-");
+    return { vttCue, word };
+  });
+};
+
+export const parseStart = (start: string) => {
+  try {
+    const splitted = start.split(":");
+    if (splitted.length === 3) {
+      const h = parseFloat(splitted[0]);
+      const m = parseFloat(splitted[1]);
+      const s = parseFloat(splitted[2]);
+      return h * 60 * 60 + m * 60 + s;
+    } else {
+      return parseFloat(start);
+    }
+  } catch (e) {
+    return 0;
+  }
 };

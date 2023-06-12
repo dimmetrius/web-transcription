@@ -11,6 +11,7 @@ import Slider from "../Slider";
 
 type Props = {
   link: string;
+  start: number;
   items: Array<TranscriptionItem>;
   eventEmitter: EventEmitter;
 };
@@ -59,7 +60,7 @@ const useWindowsSize = () => {
 };
 
 export const Player = (props: Props) => {
-  const { link, items = [], eventEmitter: emitter } = props;
+  const { link, items = [], start = 0, eventEmitter: emitter } = props;
   const [play, setPlay] = useState(false);
   const [time, setTime] = useState(0);
   const [maxValue, setMaxValue] = useState(0);
@@ -70,7 +71,14 @@ export const Player = (props: Props) => {
   useEffect(() => {
     if (!playerRef.current) return;
     playerRef.current.onloadedmetadata = function () {
-      setMaxValue(Math.round((playerRef?.current?.duration || 0) * 100) / 100);
+      const _maxVal =
+        Math.round((playerRef?.current?.duration || 0) * 100) / 100;
+      const startValue = _maxVal < start ? 0 : start;
+      if (playerRef?.current) {
+        playerRef.current.currentTime = startValue;
+      }
+      setMaxValue(_maxVal);
+      setTime(startValue);
     };
 
     playerRef.current.onended = function () {
@@ -99,7 +107,7 @@ export const Player = (props: Props) => {
     return () => {
       emitter.removeListener("playStart", onPlayStart);
     };
-  }, [link, items, emitter]);
+  }, [link, start, items, emitter]);
 
   useEffect(() => {
     if (!playerRef.current) return;
